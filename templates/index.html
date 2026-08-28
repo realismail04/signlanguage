@@ -1156,6 +1156,24 @@
 
 <script>
 
+const API_BASE = window.SIGNSPEAK_API_URL || "";
+
+function apiUrl(path) {
+    return API_BASE.replace(/\/$/, "") + path;
+}
+
+async function readJson(response) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (!contentType.includes("application/json")) {
+        throw new Error(
+            "Backend connected nahi hai. GitHub Pages sirf frontend host karta hai; Flask app ka Render URL configure karein."
+        );
+    }
+
+    return response.json();
+}
+
 let cameraActive = false;
 
 let updateInterval = null;
@@ -1257,7 +1275,7 @@ async function startCamera() {
 
         const response =
             await fetch(
-                "/start_camera",
+                apiUrl("/start_camera"),
                 {
                     method: "POST"
                 }
@@ -1265,7 +1283,7 @@ async function startCamera() {
 
 
         const data =
-            await response.json();
+            await readJson(response);
 
 
         if (!response.ok ||
@@ -1305,7 +1323,7 @@ async function startCamera() {
 
 
         video.src =
-            "/video_feed?t=" +
+            apiUrl("/video_feed?t=") +
             Date.now();
 
         video.style.display =
@@ -1401,7 +1419,7 @@ async function stopCamera() {
     try {
 
         await fetch(
-            "/stop_camera",
+            apiUrl("/stop_camera"),
             {
                 method: "POST"
             }
@@ -1516,7 +1534,7 @@ async function updateSentence() {
 
         const response =
             await fetch(
-                "/get_sentence",
+                apiUrl("/get_sentence"),
                 {
                     cache: "no-store"
                 }
@@ -1524,7 +1542,7 @@ async function updateSentence() {
 
 
         const data =
-            await response.json();
+            await readJson(response);
 
 
         /* Current sign */
@@ -1565,7 +1583,6 @@ async function updateSentence() {
                 "sentenceText"
             );
 
-
         if (sentence !== lastSentence) {
 
             sentenceElement.textContent =
@@ -1600,7 +1617,7 @@ async function clearSentence() {
 
         const response =
             await fetch(
-                "/clear_sentence",
+                apiUrl("/clear_sentence"),
                 {
                     method: "POST"
                 }
@@ -1608,7 +1625,7 @@ async function clearSentence() {
 
 
         const data =
-            await response.json();
+            await readJson(response);
 
 
         if (data.status === "success") {
@@ -1669,9 +1686,6 @@ async function speakSentence() {
             "audioElement"
         );
 
-
-    button.disabled = true;
-
     button.textContent =
         "⏳ GENERATING...";
 
@@ -1681,12 +1695,11 @@ async function speakSentence() {
         "info"
     );
 
-
     try {
 
         const response =
             await fetch(
-                "/speak_sentence",
+                apiUrl("/speak_sentence"),
                 {
                     method: "POST"
                 }
@@ -1694,7 +1707,7 @@ async function speakSentence() {
 
 
         const data =
-            await response.json();
+            await readJson(response);
 
 
         if (data.status !== "success") {
@@ -1705,8 +1718,6 @@ async function speakSentence() {
             );
 
         }
-
-
         audio.src =
             data.audio_url +
             "?t=" +

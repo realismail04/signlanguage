@@ -7,3 +7,4 @@ joblib
 gtts
 gdown
 gunicorn
+flask-cors

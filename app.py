@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, jsonify, send_from_directory
+from flask_cors import CORS
 import cv2
 import mediapipe as mp
 import numpy as np
@@ -13,6 +14,7 @@ import gdown
 import threading
 
 app = Flask(__name__)
+CORS(app)
 
 # ============================================================
 # GLOBAL STATE
