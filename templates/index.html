@@ -842,6 +842,53 @@
         }
 
 
+        .chatbot {
+
+            margin-top: 18px;
+            padding: 16px;
+            border: 1px solid #b9d8e8;
+            border-radius: 10px;
+            background: #eef8fc;
+
+        }
+
+
+        .chatbot-title {
+
+            color: #174d68;
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+
+        }
+
+
+        .chatbot-message {
+
+            color: #27424d;
+            line-height: 1.45;
+            min-height: 48px;
+
+        }
+
+
+        .chatbot-actions {
+
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+
+        }
+
+
+        .chatbot-actions .btn {
+
+            flex: 1;
+            padding: 10px 12px;
+
+        }
+
+
         /* MOBILE */
 
         @media(max-width: 900px) {
@@ -1085,6 +1132,24 @@
             </div>
 
 
+            <div class="chatbot" id="chatbot">
+
+                <div class="chatbot-title">Assistant</div>
+
+                <div class="chatbot-message" id="chatbotMessage">
+                    Start the camera and I will confirm each clear sign with you.
+                </div>
+
+                <div class="chatbot-actions" id="chatbotActions" style="display:none">
+
+                    <button class="btn btn-primary" onclick="answerChatbot(true)">YES</button>
+                    <button class="btn btn-danger" onclick="answerChatbot(false)">NO</button>
+
+                </div>
+
+            </div>
+
+
             <!-- THUMB UP -->
 
             <div class="gesture-help">
@@ -1179,6 +1244,8 @@ let cameraActive = false;
 let updateInterval = null;
 
 let lastSentence = "";
+let chatbotSign = "";
+let chatbotWaiting = false;
 
 
 /* ============================================================
@@ -1216,6 +1283,60 @@ function showNotification(
         );
 
     }, 4000);
+
+}
+
+
+function askChatbot(sign) {
+
+    if (!sign || sign === "nothing" || chatbotWaiting || sign === chatbotSign) {
+        return;
+    }
+
+    chatbotSign = sign;
+    chatbotWaiting = true;
+
+    document.getElementById("chatbotMessage").textContent =
+        `Are you trying to say ${sign.toUpperCase()}?`;
+    document.getElementById("chatbotActions").style.display = "flex";
+
+}
+
+
+async function answerChatbot(confirmed) {
+
+    const message = document.getElementById("chatbotMessage");
+    const actions = document.getElementById("chatbotActions");
+
+    actions.style.display = "none";
+
+    try {
+
+        const response = await fetch(
+            apiUrl("/chatbot_response"),
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sign: chatbotSign, confirmed })
+            }
+        );
+
+        const data = await readJson(response);
+        message.textContent = `${data.message} ${data.next_step}`;
+
+    } catch (error) {
+
+        message.textContent = error.message || "Assistant is unavailable.";
+
+    } finally {
+
+        chatbotWaiting = false;
+
+        if (!confirmed) {
+            chatbotSign = "";
+        }
+
+    }
 
 }
 
@@ -1592,6 +1713,10 @@ async function updateSentence() {
             lastSentence =
                 sentence;
 
+        }
+
+        if (data.prediction_count >= Math.max(1, data.threshold_frames - 1)) {
+            askChatbot(data.current_sign);
         }
 
 

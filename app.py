@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify, send_from_directory
+from flask import Flask, render_template, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
 import cv2
 import mediapipe as mp
@@ -749,6 +749,43 @@ def get_sentence():
 
         "camera_active": camera_active
 
+    })
+
+
+# ============================================================
+# CHATBOT CONFIRMATION
+# ============================================================
+
+@app.route("/chatbot_response", methods=["POST"])
+def chatbot_response():
+
+    payload = request.get_json(silent=True) or {}
+    sign = str(payload.get("sign", "nothing")).strip().lower()
+    confirmed = payload.get("confirmed") is True
+
+    next_steps = {
+        "help": "If you need immediate assistance, show HELP again and contact someone nearby.",
+        "water": "You can confirm WATER, then continue with another sign or press Speak Sentence.",
+        "bathroom": "You can add more signs, then press Speak Sentence to communicate the request.",
+        "pain": "Show the body location next, then press Speak Sentence to explain the request.",
+        "stop": "The next step is to stop the current action and show another sign when ready.",
+        "thank you": "You can continue with another sign or press Speak Sentence.",
+    }
+
+    if confirmed:
+        return jsonify({
+            "status": "confirmed",
+            "message": f"I understand you are trying to say {sign.upper()}.",
+            "next_step": next_steps.get(
+                sign,
+                "Continue showing the next sign, or press Speak Sentence to share this message."
+            )
+        })
+
+    return jsonify({
+        "status": "retry",
+        "message": "No problem. Hold the sign steady and try again.",
+        "next_step": "I will wait for your next clear sign."
     })
 
 
