@@ -1,4 +1,4 @@
-# 🧠 SignSpeak: Real-Time ASL to Speech Translator
+# Real-Time ASL to Speech Translator
 
 A real-time web application that uses your webcam and a machine learning model to recognize American Sign Language (ASL) **alphabet signs** and convert them into **text and speech**. Built with **Flask**, **OpenCV**, **MediaPipe**, and **gTTS**, with a clean and responsive **HTML/CSS/JS frontend**.
 
