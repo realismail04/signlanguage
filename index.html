@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ASL Sign Language Recognition</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(42, 157, 143, .28), transparent 30%),
+                linear-gradient(135deg, #122b39 0%, #1f5260 48%, #d66f45 145%);
+
+            color: #1d2b32;
+
+            padding: 34px 0 46px;
+
+        }
+
+
+        .container {
+
+            width: min(1400px, calc(100% - 56px));
+            margin: 0 auto;
+
+        }
+
+
+        .header {
+
+            color: white;
+            text-align: left;
+            margin: 0 auto 28px;
+            max-width: 1400px;
+
+        }
+
+
+        .header h1 {
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(30px, 4vw, 52px);
+            letter-spacing: 0;
+            line-height: 1.05;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, .25);
+
+        }
+
+
+        .header p {
+
+            margin-top: 10px;
+            color: #d9f2ed;
+            font-size: 17px;
+
+        }
+
+
+        .video-section,
+        .sidebar {
+
+            border: 1px solid rgba(255, 255, 255, .65);
+            border-radius: 16px;
+            box-shadow: 0 22px 55px rgba(7, 28, 36, .26);
+
+        }
+
+
+        .video-section {
+
+            padding: 18px;
+
+        }
+
+
+        .video-container {
+
+            border-radius: 10px;
+            box-shadow: inset 0 0 0 1px rgba(13, 38, 47, .12);
+
+        }
+
+
+        .sidebar {
+
+            padding: 22px;
+
+        }
+
+
+        .sidebar-title {
+
+            color: #183943;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 25px;
+            letter-spacing: 0;
+
+        }
+
+
+        .status-item {
+
+            border-left-color: #2a9d8f;
+            padding: 14px 15px;
+
+        }
+
+
+        .status-value {
+
+            color: #183943;
+
+        }
+
+
+        #currentSign {
+
+            color: #1f806f;
+
+        }
+
+
+        #progressBar {
+
+            background: linear-gradient(90deg, #2a9d8f, #e9a23b);
+
+        }
+
+
+        .sentence-display {
+
+            border: 1px solid #a8d8d0;
+            background: #f1faf8;
+
+        }
+
+
+        .sentence-display h3 {
+
+            color: #183943;
+
+        }
+
+
+        .gesture-help {
+
+            background: #fff7e7;
+            border-color: #efc36a;
+
+        }
+
+
+        .btn {
+
+            border-radius: 8px;
+            padding: 13px 22px;
+            letter-spacing: .4px;
+
+        }
+
+
+        .btn-primary {
+
+            background: #2a9d8f;
+
+        }
+
+
+        .btn-danger {
+
+            background: #c9574d;
+
+        }
+
+
+        .btn-secondary {
+
+            background: #2176a5;
+
+        }
+
+
+        .btn-warning {
+
+            background: #e58f25;
+
+        }
+
+
+        @media(max-width: 600px) {
+
+            body {
+                padding-top: 22px;
+            }
+
+            .container {
+                width: calc(100% - 28px);
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .header p {
+                font-size: 15px;
+            }
+
+            .video-section,
+            .sidebar {
+                padding: 12px;
+            }
+
+        }
+
+
+        .header h1 {
+
+            font-size: 42px;
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+
+            text-shadow:
+                0 3px 10px rgba(0,0,0,.25);
+
+        }
+
+
+        .header p {
+
+            font-size: 19px;
+
+            opacity: .9;
+
+        }
+
+
+        /* MAIN */
+
+        .main-content {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                360px;
+
+            gap: 30px;
+
+            align-items: start;
+
+        }
+
+
+        /* VIDEO CARD */
+
+        .video-section {
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,.22);
+
+        }
+
+
+        .video-container {
+
+            position: relative;
+
+            width: 100%;
+
+            aspect-ratio: 4 / 3;
+
+            background: #111;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+        }
+
+
+        #videoStream {
+
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            background: #111;
+
+            display: none;
+
+        }
+
+
+        .video-placeholder {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 20px;
+
+            color: #666;
+
+            background: #f0f0f0;
+
+        }
+
+
+        .placeholder-content {
+
+            background: rgba(255,255,255,.95);
+
+            padding: 25px 35px;
+
+            border-radius: 15px;
+
+        }
+
+
+        .placeholder-icon {
+
+            font-size: 55px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .placeholder-title {
+
+            font-size: 20px;
+
+            font-weight: 700;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .placeholder-subtitle {
+
+            color: #777;
+
+        }
+
+
+        /* LOADING */
+
+        .loading {
+
+            display: none;
+
+        }
+
+
+        .spinner {
+
+            width: 45px;
+
+            height: 45px;
+
+            margin: 0 auto 15px;
+
+            border:
+                4px solid #ddd;
+
+            border-top-color:
+                #667eea;
+
+            border-radius: 50%;
+
+            animation:
+                spin .8s linear infinite;
+
+        }
+
+
+        @keyframes spin {
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+
+        /* CONTROLS */
+
+        .controls {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            margin-top: 20px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .btn {
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 13px 26px;
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition:
+                transform .2s,
+                box-shadow .2s,
+                opacity .2s;
+
+        }
+
+
+        .btn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 7px 18px
+                rgba(0,0,0,.18);
+
+        }
+
+
+        .btn:disabled {
+
+            opacity: .55;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+        .btn-primary {
+
+            background:
+                linear-gradient(
+                    45deg,
+                    #4caf50,
+                    #45a049
+                );
+
+        }
+
+
+        .btn-danger {
+
+            background:
+                linear-gradient(
+                    45deg,
+                    #f44336,
+                    #d32f2f
+                );
+
+        }
+
+
+        .btn-secondary {
+
+            background:
+                linear-gradient(
+                    45deg,
+                    #2196f3,
+                    #1976d2
+                );
+
+        }
+
+
+        .btn-warning {
+
+            background:
+                linear-gradient(
+                    45deg,
+                    #ff9800,
+                    #f57c00
+                );
+
+        }
+
+
+        /* SIDEBAR */
+
+        .sidebar {
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,.22);
+
+        }
+
+
+        .sidebar-title {
+
+            font-size: 23px;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .status-item {
+
+            background: #f7f8fa;
+
+            border-left:
+                4px solid #667eea;
+
+            border-radius: 9px;
+
+            padding: 15px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .status-label {
+
+            color: #555;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .status-value {
+
+            font-size: 19px;
+
+            font-weight: 600;
+
+            color: #333;
+
+        }
+
+
+        #currentSign {
+
+            color: #667eea;
+
+            font-family:
+                Consolas,
+                monospace;
+
+        }
+
+
+        /* PROGRESS */
+
+        .progress-container {
+
+            margin-top: 10px;
+
+            height: 5px;
+
+            width: 100%;
+
+            background: #ddd;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+        }
+
+
+        #progressBar {
+
+            height: 100%;
+
+            width: 0%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #667eea,
+                    #764ba2
+                );
+
+            transition:
+                width .1s linear;
+
+        }
+
+
+        /* SENTENCE */
+
+        .sentence-display {
+
+            margin-top: 22px;
+
+            padding: 18px;
+
+            border:
+                2px dashed #667eea;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8f9fa,
+                    #e9ecef
+                );
+
+        }
+
+
+        .sentence-display h3 {
+
+            font-size: 17px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        #sentenceText {
+
+            min-height: 75px;
+
+            background: white;
+
+            border:
+                1px solid #ddd;
+
+            border-radius: 9px;
+
+            padding: 15px;
+
+            font-size: 20px;
+
+            line-height: 1.5;
+
+            word-break: break-word;
+
+        }
+
+
+        /* THUMB UP HELP */
+
+        .gesture-help {
+
+            margin-top: 18px;
+
+            padding: 15px;
+
+            background: #fff8df;
+
+            border:
+                1px solid #ffd76a;
+
+            border-radius: 10px;
+
+        }
+
+
+        .gesture-help strong {
+
+            display: block;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .gesture-help span {
+
+            color: #666;
+
+            font-size: 14px;
+
+        }
+
+
+        /* ACTIONS */
+
+        .actions {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            margin-top: 18px;
+
+        }
+
+
+        .audio-player {
+
+            display: none;
+
+            background: #f0f8ff;
+
+            border:
+                1px solid #667eea;
+
+            padding: 10px;
+
+            border-radius: 9px;
+
+        }
+
+
+        audio {
+
+            width: 100%;
+
+        }
+
+
+        /* NOTIFICATION */
+
+        .notification {
+
+            position: fixed;
+
+            right: 20px;
+
+            top: 20px;
+
+            max-width: 350px;
+
+            padding: 14px 18px;
+
+            border-radius: 9px;
+
+            color: white;
+
+            font-weight: 600;
+
+            opacity: 0;
+
+            transform:
+                translateX(120%);
+
+            transition:
+                all .3s ease;
+
+            z-index: 9999;
+
+        }
+
+
+        .notification.show {
+
+            opacity: 1;
+
+            transform:
+                translateX(0);
+
+        }
+
+
+        .notification.success {
+
+            background: #2e7d32;
+
+        }
+
+
+        .notification.error {
+
+            background: #c62828;
+
+        }
+
+
+        .notification.info {
+
+            background: #1565c0;
+
+        }
+
+
+        /* MOBILE */
+
+        @media(max-width: 900px) {
+
+            .main-content {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .header h1 {
+
+                font-size: 32px;
+
+            }
+
+        }
+
+
+        @media(max-width: 600px) {
+
+            .container {
+
+                width: 94%;
+
+            }
+
+            .header h1 {
+
+                font-size: 27px;
+
+            }
+
+            .header p {
+
+                font-size: 16px;
+
+            }
+
+            .video-section,
+            .sidebar {
+
+                padding: 15px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>University Group Project</h1>
+
+        <p>
+            Real-time American Sign Language Recognition
+        </p>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <div class="main-content">
+
+
+        <!-- VIDEO -->
+
+        <div class="video-section">
+
+            <div class="video-container">
+
+
+                <div
+                    class="video-placeholder"
+                    id="videoPlaceholder"
+                >
+
+                    <div
+                        class="placeholder-content"
+                        id="placeholderContent"
+                    >
+
+                        <div
+                            class="placeholder-icon"
+                        >
+                            📹
+                        </div>
+
+                        <div
+                            class="placeholder-title"
+                        >
+                            Camera is stopped
+                        </div>
+
+                        <div
+                            class="placeholder-subtitle"
+                        >
+                            Click Start Camera
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="loading"
+                        id="loading"
+                    >
+
+                        <div
+                            class="spinner"
+                        ></div>
+
+                        <strong>
+                            Starting camera...
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <img
+                    id="videoStream"
+                    src=""
+                    alt="Live camera stream"
+                >
+
+
+            </div>
+
+
+            <!-- CONTROLS -->
+
+            <div class="controls">
+
+                <button
+                    class="btn btn-primary"
+                    id="startBtn"
+                    onclick="startCamera()"
+                >
+                    📹 START CAMERA
+                </button>
+
+
+                <button
+                    class="btn btn-danger"
+                    id="stopBtn"
+                    onclick="stopCamera()"
+                    style="display:none"
+                >
+                    ⏹ STOP CAMERA
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- SIDEBAR -->
+
+        <div class="sidebar">
+
+
+            <div class="sidebar-title">
+
+                📊 Live Status
+
+            </div>
+
+
+            <!-- SIGN -->
+
+            <div class="status-item">
+
+                <div class="status-label">
+                    Current Sign
+                </div>
+
+                <div
+                    class="status-value"
+                    id="currentSign"
+                >
+                    nothing
+                </div>
+
+
+                <div
+                    class="progress-container"
+                >
+
+                    <div
+                        id="progressBar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CAMERA -->
+
+            <div class="status-item">
+
+                <div class="status-label">
+                    Camera Status
+                </div>
+
+                <div
+                    class="status-value"
+                    id="cameraStatus"
+                >
+                    Stopped
+                </div>
+
+            </div>
+
+
+            <!-- SENTENCE -->
+
+            <div class="sentence-display">
+
+                <h3>
+                    📝 Constructed Sentence
+                </h3>
+
+                <div id="sentenceText">
+                    Your sentence will appear here...
+                </div>
+
+            </div>
+
+
+            <!-- THUMB UP -->
+
+            <div class="gesture-help">
+
+                <strong>
+                    👍 Thumb Up Gesture
+                </strong>
+
+                <span>
+                    Hold your thumb up with the
+                    other four fingers folded.
+                    The system will recognize it
+                    as <b>OKAY</b>.
+                </span>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="actions">
+
+
+                <button
+                    class="btn btn-secondary"
+                    id="speakBtn"
+                    onclick="speakSentence()"
+                >
+                    🔊 SPEAK SENTENCE
+                </button>
+
+
+                <button
+                    class="btn btn-warning"
+                    onclick="clearSentence()"
+                >
+                    🗑 CLEAR SENTENCE
+                </button>
+
+
+                <div
+                    class="audio-player"
+                    id="audioPlayer"
+                >
+
+                    <audio
+                        id="audioElement"
+                        controls
+                    ></audio>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NOTIFICATION -->
+
+<div
+    class="notification"
+    id="notification"
+></div>
+
+
+<script>
+
+let cameraActive = false;
+
+let updateInterval = null;
+
+let lastSentence = "";
+
+
+/* ============================================================
+   NOTIFICATION
+============================================================ */
+
+function showNotification(
+    message,
+    type = "success"
+) {
+
+    const notification =
+        document.getElementById(
+            "notification"
+        );
+
+    notification.textContent = message;
+
+    notification.className =
+        "notification " + type;
+
+    setTimeout(() => {
+
+        notification.classList.add(
+            "show"
+        );
+
+    }, 10);
+
+
+    setTimeout(() => {
+
+        notification.classList.remove(
+            "show"
+        );
+
+    }, 4000);
+
+}
+
+
+/* ============================================================
+   START CAMERA
+============================================================ */
+
+async function startCamera() {
+
+    if (cameraActive) {
+        return;
+    }
+
+
+    const startBtn =
+        document.getElementById(
+            "startBtn"
+        );
+
+    const video =
+        document.getElementById(
+            "videoStream"
+        );
+
+    const placeholder =
+        document.getElementById(
+            "videoPlaceholder"
+        );
+
+    const placeholderContent =
+        document.getElementById(
+            "placeholderContent"
+        );
+
+    const loading =
+        document.getElementById(
+            "loading"
+        );
+
+
+    startBtn.disabled = true;
+
+    placeholder.style.display =
+        "flex";
+
+    placeholderContent.style.display =
+        "none";
+
+    loading.style.display =
+        "block";
+
+
+    try {
+
+        /* Tell Flask to open camera */
+
+        const response =
+            await fetch(
+                "/start_camera",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok ||
+            data.status !== "success") {
+
+            throw new Error(
+                data.message ||
+                "Camera could not start"
+            );
+
+        }
+
+
+        video.onload = function() {
+
+            placeholder.style.display =
+                "none";
+
+            video.style.display =
+                "block";
+
+        };
+
+
+        video.onerror = function() {
+
+            console.error(
+                "Video stream failed"
+            );
+
+            showNotification(
+                "Camera opened but video stream failed.",
+                "error"
+            );
+
+        };
+
+
+        video.src =
+            "/video_feed?t=" +
+            Date.now();
+
+        video.style.display =
+            "block";
+
+        placeholder.style.display =
+            "none";
+
+        loading.style.display =
+            "none";
+
+
+        /* UI */
+
+        cameraActive = true;
+
+
+        document.getElementById(
+            "startBtn"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "stopBtn"
+        ).style.display = "inline-block";
+
+
+        document.getElementById(
+            "cameraStatus"
+        ).textContent = "Active";
+
+
+        /* Start status polling */
+
+        updateInterval =
+            setInterval(
+                updateSentence,
+                150
+            );
+
+
+        showNotification(
+            "Camera started successfully!",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Start camera error:",
+            error
+        );
+
+
+        cameraActive = false;
+
+        video.src = "";
+
+        video.style.display =
+            "none";
+
+        placeholder.style.display =
+            "flex";
+
+        placeholderContent.style.display =
+            "block";
+
+        loading.style.display =
+            "none";
+
+        startBtn.disabled =
+            false;
+
+
+        showNotification(
+            error.message ||
+            "Failed to start camera",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   STOP CAMERA
+============================================================ */
+
+async function stopCamera() {
+
+    try {
+
+        await fetch(
+            "/stop_camera",
+            {
+                method: "POST"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+
+    cameraActive = false;
+
+
+    if (updateInterval) {
+
+        clearInterval(
+            updateInterval
+        );
+
+        updateInterval = null;
+
+    }
+
+
+    const video =
+        document.getElementById(
+            "videoStream"
+        );
+
+
+    video.src = "";
+
+    video.style.display =
+        "none";
+
+
+    document.getElementById(
+        "videoPlaceholder"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "placeholderContent"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "loading"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "startBtn"
+    ).style.display =
+        "inline-block";
+
+
+    document.getElementById(
+        "startBtn"
+    ).disabled = false;
+
+
+    document.getElementById(
+        "stopBtn"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "cameraStatus"
+    ).textContent =
+        "Stopped";
+
+
+    document.getElementById(
+        "currentSign"
+    ).textContent =
+        "nothing";
+
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        "0%";
+
+
+    showNotification(
+        "Camera stopped",
+        "info"
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE SENTENCE
+============================================================ */
+
+async function updateSentence() {
+
+    if (!cameraActive) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/get_sentence",
+                {
+                    cache: "no-store"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* Current sign */
+
+        document.getElementById(
+            "currentSign"
+        ).textContent =
+            data.current_sign ||
+            "nothing";
+
+
+        /* Progress */
+
+        const percentage =
+            Math.min(
+                100,
+                (
+                    data.prediction_count /
+                    data.threshold_frames
+                ) * 100
+            );
+
+
+        document.getElementById(
+            "progressBar"
+        ).style.width =
+            percentage + "%";
+
+
+        /* Sentence */
+
+        const sentence =
+            data.sentence || "";
+
+
+        const sentenceElement =
+            document.getElementById(
+                "sentenceText"
+            );
+
+
+        if (sentence !== lastSentence) {
+
+            sentenceElement.textContent =
+                sentence ||
+                "Your sentence will appear here...";
+
+            lastSentence =
+                sentence;
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Status update error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CLEAR SENTENCE
+============================================================ */
+
+async function clearSentence() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/clear_sentence",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.status === "success") {
+
+            lastSentence = "";
+
+            document.getElementById(
+                "sentenceText"
+            ).textContent =
+                "Your sentence will appear here...";
+
+
+            document.getElementById(
+                "audioPlayer"
+            ).style.display =
+                "none";
+
+
+            showNotification(
+                "Sentence cleared!",
+                "success"
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        showNotification(
+            "Failed to clear sentence",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   SPEAK
+============================================================ */
+
+async function speakSentence() {
+
+    const button =
+        document.getElementById(
+            "speakBtn"
+        );
+
+    const audioPlayer =
+        document.getElementById(
+            "audioPlayer"
+        );
+
+    const audio =
+        document.getElementById(
+            "audioElement"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "⏳ GENERATING...";
+
+
+    showNotification(
+        "Generating speech...",
+        "info"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/speak_sentence",
+                {
+                    method: "POST"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.status !== "success") {
+
+            throw new Error(
+                data.message ||
+                "Speech generation failed"
+            );
+
+        }
+
+
+        audio.src =
+            data.audio_url +
+            "?t=" +
+            Date.now();
+
+
+        audioPlayer.style.display =
+            "block";
+
+
+        try {
+
+            await audio.play();
+
+        } catch {
+
+            showNotification(
+                "Audio generated. Press play.",
+                "success"
+            );
+
+            return;
+
+        }
+
+
+        showNotification(
+            "Playing speech...",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showNotification(
+            error.message ||
+            "Failed to generate speech",
+            "error"
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+            "🔊 SPEAK SENTENCE";
+
+    }
+
+}
+
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+============================================================ */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape" &&
+            cameraActive
+        ) {
+
+            stopCamera();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   PAGE CLOSE
+============================================================ */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        if (cameraActive) {
+
+            navigator.sendBeacon(
+                "/stop_camera"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
