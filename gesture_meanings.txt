@@ -30,3 +30,25 @@ CUSTOM GESTURE MEANINGS
 The webcam detector uses MediaPipe hand landmarks. Static hand poses are
 recognized frame by frame; motion-based gestures such as waving, clapping,
 handshakes, and writing need movement tracking for highly reliable detection.
+
+DAILY-USE SIGN VOCABULARY (NEXT TRAINING SET)
+
+Communication: HELLO, HI, GOOD MORNING, GOODBYE, THANK YOU, PLEASE, SORRY,
+YES, NO, OKAY, HELP
+
+Daily needs: WATER, FOOD, EAT, TEA, HUNGRY, THIRSTY, BATHROOM, SLEEP,
+WAKE UP, MEDICINE, PAIN, TIRED, COLD, HOT
+
+Emergency: HELP ME, EMERGENCY, STOP, DANGER, CALL SOMEONE, DOCTOR, POLICE,
+FIRE, I AM OKAY, I NEED HELP
+
+Sentence templates:
+
+WATER -> I NEED WATER
+BATHROOM -> I NEED TO USE THE BATHROOM
+HELP -> PLEASE HELP ME
+PAIN + BODY LOCATION -> I HAVE PAIN HERE
+
+The current trained encoder contains only A-Z, del, nothing, and space. The
+daily-use vocabulary above is documented for the next dataset/model training
+step and is not yet recognized by the current model.
