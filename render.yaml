@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: signlanguage
+    runtime: python
+    buildCommand: pip install -r requirement.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /
+    plan: free
