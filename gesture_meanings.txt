@@ -1,0 +1,32 @@
+CUSTOM GESTURE MEANINGS
+
+👍  = OKAY
+👎  = NO
+✌️  = HELLO
+👋  = HI
+👌  = PERFECT
+🤟  = I LOVE YOU
+🤞  = GOOD LUCK
+🤘  = ROCK
+☝️  = ONE
+✋  = STOP
+🤚  = WAIT
+🖐️  = FIVE
+✊  = FIST
+🤏  = SMALL
+🤌  = WHAT
+👇  = DOWN
+👆  = UP
+👉  = RIGHT
+👈  = LEFT
+🤲  = PLEASE
+🙏  = THANK YOU
+👏  = APPLAUSE
+🤝  = DEAL
+💪  = STRONG
+✍️  = WRITE
+🤙  = CALL ME
+
+The webcam detector uses MediaPipe hand landmarks. Static hand poses are
+recognized frame by frame; motion-based gestures such as waving, clapping,
+handshakes, and writing need movement tracking for highly reliable detection.
