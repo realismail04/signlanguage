@@ -147,8 +147,6 @@ CUSTOM_GESTURES = {
     "one": "ONE",
     "stop": "STOP",
     "wait": "WAIT",
-    "five": "FIVE",
-    "fist": "FIST",
     "small": "SMALL",
     "what": "WHAT",
     "down": "DOWN",
@@ -216,12 +214,8 @@ def detect_custom_gesture(hand_landmarks):
         return "one"
     if thumb_extended and extended_count == 0:
         return "strong"
-    if extended_count == 0:
-        return "fist"
     if thumb_index_touching and extended_count >= 2:
         return "perfect"
-    if extended_count == 4:
-        return "five"
     return None
 
 

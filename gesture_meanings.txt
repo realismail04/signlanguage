@@ -11,8 +11,6 @@ CUSTOM GESTURE MEANINGS
 ☝️  = ONE
 ✋  = STOP
 🤚  = WAIT
-🖐️  = FIVE
-✊  = FIST
 🤏  = SMALL
 🤌  = WHAT
 👇  = DOWN
