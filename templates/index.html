@@ -1322,7 +1322,11 @@ async function answerChatbot(confirmed) {
         );
 
         const data = await readJson(response);
-        message.textContent = `${data.message} ${data.next_step}`;
+        const suggested = data.suggested_message
+            ? ` Suggested message: "${data.suggested_message}"`
+            : "";
+
+        message.textContent = `${data.message}${suggested} ${data.next_step}`;
 
     } catch (error) {
 

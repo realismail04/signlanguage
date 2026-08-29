@@ -763,6 +763,35 @@ def chatbot_response():
     sign = str(payload.get("sign", "nothing")).strip().lower()
     confirmed = payload.get("confirmed") is True
 
+    routine_messages = {
+        "hello": "Hello, how are you?",
+        "hi": "Hello, how are you?",
+        "good morning": "Good morning, how are you?",
+        "goodbye": "Goodbye, see you later.",
+        "water": "I need water.",
+        "food": "I need food.",
+        "eat": "I want to eat.",
+        "tea": "I would like tea.",
+        "hungry": "I am hungry.",
+        "thirsty": "I am thirsty.",
+        "bathroom": "I need to use the bathroom.",
+        "sleep": "I want to sleep.",
+        "wake up": "Please wake me up.",
+        "medicine": "I need my medicine.",
+        "pain": "I have pain here.",
+        "sick": "I am sick.",
+        "tired": "I am tired.",
+        "cold": "I feel cold.",
+        "hot": "I feel hot.",
+        "help": "Please help me.",
+        "emergency": "This is an emergency. I need help.",
+        "doctor": "I need a doctor.",
+        "police": "Please call the police.",
+        "fire": "There is a fire. Please help.",
+        "i am okay": "I am okay.",
+        "i need help": "I need help.",
+    }
+
     next_steps = {
         "help": "If you need immediate assistance, show HELP again and contact someone nearby.",
         "water": "You can confirm WATER, then continue with another sign or press Speak Sentence.",
@@ -776,6 +805,7 @@ def chatbot_response():
         return jsonify({
             "status": "confirmed",
             "message": f"I understand you are trying to say {sign.upper()}.",
+            "suggested_message": routine_messages.get(sign, ""),
             "next_step": next_steps.get(
                 sign,
                 "Continue showing the next sign, or press Speak Sentence to share this message."
